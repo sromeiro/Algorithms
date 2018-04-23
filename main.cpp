@@ -5,9 +5,7 @@
 #include<string>
 #include<fstream>
 #include<vector>
-
-//Location listed below is my local directory for the boost library.
-#include "/mnt/s/School/boost_1_67_0/boost/graph/adjacency_list.hpp"
+#include<boost/graph/adjacency_list.hpp>
 
 //Change file name here if needed.
 #define FILENAME "apollodiana.txt"
