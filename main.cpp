@@ -120,6 +120,36 @@ int main()
              << "\tdirection: " << vertexes[i].direction << endl;
     }
 
+    //For loop to add correct edges between vertices
+    for(int i = 0; i < totalRows * totalColumns; i++)
+    {
+        if((vertexes[i].direction.compare("E") == 0)
+          || (vertexes[i].direction.compare("W") == 0))
+        {
+            //cout << "Found: " << vertexes[i].direction << endl;
+        }
+        else if((vertexes[i].direction.compare("N") == 0)
+            || (vertexes[i].direction.compare("S") == 0))
+        {
+            //cout << "Found: " << vertexes[i].direction << endl;
+        }
+        else if ((vertexes[i].direction.compare("NW") == 0)
+            || (vertexes[i].direction.compare("SE") == 0))
+        {
+            //cout << "Found: " << vertexes[i].direction << endl;
+        }
+        else
+        {
+            //cout << "Found: " << vertexes[i].direction << endl;
+        }
+    }
+
+
+
+
+
+
+
     //Define a new type for simplicity. This will be a vertex iterator type
     typedef boost::adjacency_list<>::vertex_iterator vertIterator;
 
@@ -129,7 +159,7 @@ int main()
     //Loop through entire graph from first vertex id to end
     for (vertIterator it = vertPair.first; it != vertPair.second; ++it)
     {
-        cout << *it << endl;
+        //cout << *it << endl;
     }
 
 
