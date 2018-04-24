@@ -20,11 +20,8 @@ struct vertex
 };
 
 //===================================TO DO====================================//
-/* Need to add edges between vertices depending on the direction given.
-*  If direction is E or W just add edges between adjacent vertices +/- 1
-*  If direction is N or S add edges between vertices in +/- 8 for top and bottom
-*  If direction is NW, SE add edges between vertices in +/- 9 since longer
-*  If direction is NE, SW add edges between vertices in +/- 7 since shorter
+/* Need to figure out how to use BFS in Boost library to traverse my graph
+*  and return the shortest path between two points.
 */
 //============================================================================//
 
