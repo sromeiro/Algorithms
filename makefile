@@ -1,7 +1,7 @@
 all: proj
 
 proj: main.o
-	g++ -Wall main.o -o proj
+	g++ -Wall -I$BOOST_HOME main.o -o proj
 
 main.o: main.cpp
 	g++ -Wall -c main.cpp

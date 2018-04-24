@@ -30,9 +30,32 @@ struct vertex
 
 int main()
 {
-    int totalRows, totalColumns;
+    int totalRows, totalColumns, totalVertices;
     //int row, column;
-    boost::adjacency_list<> graph;
+
+    //Define Edge Weight Property type
+    typedef boost::property<boost::edge_weight_t, int> EdgeWeightProperty;
+    //Define adjacency list directed graph type
+    typedef boost:: adjacency_list< boost::listS,
+                                    boost::vecS,
+                                    boost::directedS,
+                                    boost::no_property,
+                                    EdgeWeightProperty > Graph;
+
+    //Define edge edge_descriptor NOT NEEDED?
+    //typedef Graph::edge_descriptor Edge;
+
+    //Create graph
+    Graph graph;
+
+    pair<boost::adjacency_list<>::edge_descriptor, bool> edge;
+
+    //Create Edge Weight Map to store edge weights
+    boost::property_map < Graph, boost::edge_weight_t >::type EdgeWeightMap;
+    EdgeWeightMap = get(boost::edge_weight, graph);
+
+    //Edge iterators to iterate through all edges of graph
+    boost::graph_traits< Graph >::edge_iterator edge_it, edge_end;
 
     /*
     vertex v1, v2, v3, v4;
@@ -87,11 +110,12 @@ int main()
     }
 
     inFile >> totalRows >> totalColumns;
+    totalVertices = totalRows * totalColumns;
     cout << "Totalrows: " << totalRows << "\ttotalColumns: " << totalColumns
          << endl;
 
     //Create an array of vertex structures, an array of vertices
-    vertex vertexes[totalRows*totalColumns];
+    vertex vertexes[totalVertices];
 
     for(int i = 0; i < totalRows*totalColumns; i++)
     {
@@ -112,35 +136,461 @@ int main()
         }
         else
         {
+            if(i == 63)
+                continue;
             //Direction is N, E, S, W
             vertexes[i].direction = tempStr[2];
         }
-        cout << "vertexID: " << vertexes[i].id
-             << "\tcolor: "  << vertexes[i].color
-             << "\tdirection: " << vertexes[i].direction << endl;
+        // cout << "vertexID: " << vertexes[i].id
+        //      << "\tcolor: "  << vertexes[i].color
+        //      << "\tdirection: " << vertexes[i].direction << endl;
     }
+
+    // cout << "Target ID: " << vertexes[63].id
+    //      << " Target color: " << vertexes[63].color
+    //      << " Target direction: " << vertexes[63].direction << endl;
+
+
+
 
     //For loop to add correct edges between vertices
     for(int i = 0; i < totalRows * totalColumns; i++)
     {
-        if((vertexes[i].direction.compare("E") == 0)
-          || (vertexes[i].direction.compare("W") == 0))
+        //Variable j to keep track of vertex we're connecting an edge to
+        int j;
+        if(vertexes[i].direction.compare("E") == 0)
         {
-            //cout << "Found: " << vertexes[i].direction << endl;
+            //variable edgeWeight for weight
+            int edgeWeight = -1;
+            // cout << "\nFound: " << vertexes[i].direction << endl;
+            switch(vertexes[i].color)
+            {
+                case 'R':
+                    //When we find a RED arrow
+                    // cout << "I'm a " << vertexes[i].color << " vertex at " << vertexes[i].id << endl;
+                    for(j = i; j < (totalRows + i) - (i % totalRows); j++)
+                    {
+                        edgeWeight++;
+                        if(vertexes[j].color == 'B')
+                        {
+                            //Add edge between i and j with weight
+                            edge = add_edge(vertexes[i].id, vertexes[j].id, EdgeWeightProperty(edgeWeight), graph);
+                            // cout << "Found a " << vertexes[j].color
+                            // << " at vertex " << vertexes[j].id
+                            // << " with edge weight: " << edgeWeight << endl;
+                        }
+                        else if(vertexes[j].color == 'O')
+                        {
+                            //Target FOUND add edge between i and j with weight
+                            edge = add_edge(vertexes[i].id, vertexes[j].id, EdgeWeightProperty(edgeWeight), graph);
+                            // cout << "FOUND TARGET " << vertexes[j].color
+                            // << " at vertex " << vertexes[j].id
+                            // << " with edge weight: " << edgeWeight << endl;
+                        }
+                    }
+                    break;
+                case 'B':
+                    //When we find a BLUE arrow
+                    // cout << "I'm a " << vertexes[i].color << " vertex at " << vertexes[i].id << endl;
+                    for(j = i; j < (totalRows + i) - (i % totalRows); j++)
+                    {
+                        edgeWeight++;
+                        if(vertexes[j].color == 'R')
+                        {
+                            //Add edge between i and j with weight
+                            edge = add_edge(vertexes[i].id, vertexes[j].id, EdgeWeightProperty(edgeWeight), graph);
+                            // cout << "Found a " << vertexes[j].color
+                            // << " at vertex " << vertexes[j].id
+                            // << " with edge weight: " << edgeWeight << endl;
+                        }
+                        else if(vertexes[j].color == 'O')
+                        {
+                            //Target FOUND add edge between i and j with weight
+                            edge = add_edge(vertexes[i].id, vertexes[j].id, EdgeWeightProperty(edgeWeight), graph);
+                            // cout << "FOUND TARGET " << vertexes[j].color
+                            // << " at vertex " << vertexes[j].id
+                            // << " with edge weight: " << edgeWeight << endl;
+                        }
+                    }
+                    break;
+            }
         }
-        else if((vertexes[i].direction.compare("N") == 0)
-            || (vertexes[i].direction.compare("S") == 0))
+        else if(vertexes[i].direction.compare("W") == 0)
         {
-            //cout << "Found: " << vertexes[i].direction << endl;
+            //variable edgeWeight for weight
+            int edgeWeight = -1;
+            // cout << "\nFound: " << vertexes[i].direction << endl;
+            switch(vertexes[i].color)
+            {
+                case 'R':
+                    //When we find a RED arrow
+                    // cout << "I'm a " << vertexes[i].color << " vertex at " << vertexes[i].id << endl;
+                    //cout << "i = " << i << endl;
+                    // cout << "Math: \n" << "i / totalColumns = " << i/totalColumns
+                    //     << "\ni / totalColumns * totalColumns = " << (i/totalColumns) * totalColumns
+                    //     << endl;
+                    for(j = i; j >= (i/totalColumns) * totalColumns; j--)
+                    {
+                        edgeWeight++;
+                        if(vertexes[j].color == 'B')
+                        {
+                            //Add edge between i and j with weight
+                            edge = add_edge(vertexes[i].id, vertexes[j].id, EdgeWeightProperty(edgeWeight), graph);
+                            // cout << "Found a " << vertexes[j].color
+                            // << " at vertex " << vertexes[j].id
+                            // << " with edge weight: " << edgeWeight << endl;
+                        }
+                        else if(vertexes[j].color == 'O')
+                        {
+                            //probably NEVER find this
+                            cout << "FOUND TARGET " << vertexes[j].color << " at vertex " << vertexes[j].id << endl;
+                        }
+                    }
+                    break;
+                case 'B':
+                    //When we find a BLUE arrow
+                    // cout << "I'm a " << vertexes[i].color << " vertex at " << vertexes[i].id << endl;
+                    //cout << "i = " << i << endl;
+                    // cout << "Math: \n" << "i / totalColumns = " << i/totalColumns
+                    //     << "\ni / totalColumns * totalColumns = " << (i/totalColumns) * totalColumns
+                    //     << endl;
+                    for(j = i; j >= (i/totalColumns) * totalColumns; j--)
+                    {
+                        edgeWeight++;
+                        if(vertexes[j].color == 'R')
+                        {
+                            //Add edge between i and j with weight
+                            edge = add_edge(vertexes[i].id, vertexes[j].id, EdgeWeightProperty(edgeWeight), graph);
+                            // cout << "Found a " << vertexes[j].color
+                            // << " at vertex " << vertexes[j].id
+                            // << " with edge weight: " << edgeWeight << endl;
+                        }
+                        else if(vertexes[j].color == 'O')
+                        {
+                            //probably NEVER find this
+                            cout << "FOUND TARGET " << vertexes[j].color << " at vertex " << vertexes[j].id << endl;
+                        }
+                    }
+                    break;
+            }
         }
-        else if ((vertexes[i].direction.compare("NW") == 0)
-            || (vertexes[i].direction.compare("SE") == 0))
+        else if(vertexes[i].direction.compare("N") == 0)
         {
-            //cout << "Found: " << vertexes[i].direction << endl;
+            //variable edgeWeight for weight
+            int edgeWeight = -1;
+            // cout << "\nFound: " << vertexes[i].direction << endl;
+            switch(vertexes[i].color)
+            {
+                case 'R':
+                    //When we find a RED arrow
+                    // cout << "I'm a " << vertexes[i].color << " vertex at " << vertexes[i].id << endl;
+                    for(j = i; j >= 0; j -= 8)
+                    {
+                        edgeWeight++;
+                        if(vertexes[j].color == 'B')
+                        {
+                            //Add edge between i and j with weight
+                            edge = add_edge(vertexes[i].id, vertexes[j].id, EdgeWeightProperty(edgeWeight), graph);
+                            // cout << "Found a " << vertexes[j].color
+                            // << " at vertex " << vertexes[j].id
+                            // << " with edge weight: " << edgeWeight << endl;
+                        }
+                        else if(vertexes[j].color == 'O')
+                        {
+                            //Probably NEVER find this
+                            cout << "FOUND TARGET " << vertexes[j].color << " at vertex " << vertexes[j].id << endl;
+                        }
+                    }
+                    break;
+                case 'B':
+                    //When we find a BLUE arrow
+                    // cout << "I'm a " << vertexes[i].color << " vertex at " << vertexes[i].id << endl;
+                    for(j = i; j >= 0; j -= 8)
+                    {
+                        edgeWeight++;
+                        if(vertexes[j].color == 'R')
+                        {
+                            //Add edge between i and j with weight
+                            edge = add_edge(vertexes[i].id, vertexes[j].id, EdgeWeightProperty(edgeWeight), graph);
+                            // cout << "Found a " << vertexes[j].color
+                            // << " at vertex " << vertexes[j].id
+                            // << " with edge weight: " << edgeWeight << endl;
+                        }
+                        else if(vertexes[j].color == 'O')
+                        {
+                            //Probably NEVER find this
+                            cout << "FOUND TARGET " << vertexes[j].color << " at vertex " << vertexes[j].id << endl;
+                        }
+                    }
+                    break;
+            }
         }
-        else
+        else if(vertexes[i].direction.compare("S") == 0)
         {
-            //cout << "Found: " << vertexes[i].direction << endl;
+            //variable edgeWeight for weight
+            int edgeWeight = -1;
+            // cout << "\nFound: " << vertexes[i].direction << endl;
+            switch(vertexes[i].color)
+            {
+                case 'R':
+                    //When we find a RED arrow
+                    // cout << "I'm a " << vertexes[i].color << " vertex at " << vertexes[i].id << endl;
+                    for(j = i; j <= 63; j += 8)
+                    {
+                        edgeWeight++;
+                        if(vertexes[j].color == 'B')
+                        {
+                            //Add edge between i and j with weight
+                            edge = add_edge(vertexes[i].id, vertexes[j].id, EdgeWeightProperty(edgeWeight), graph);
+                            // cout << "Found a " << vertexes[j].color
+                            // << " at vertex " << vertexes[j].id
+                            // << " with edge weight: " << edgeWeight << endl;
+                        }
+                        else if(vertexes[j].color == 'O')
+                        {
+                            //Target FOUND add edge between i and j with weight
+                            edge = add_edge(vertexes[i].id, vertexes[j].id, EdgeWeightProperty(edgeWeight), graph);
+                            // cout << "FOUND TARGET " << vertexes[j].color
+                            // << " at vertex " << vertexes[j].id
+                            // << " with edge weight: " << edgeWeight << endl;
+                        }
+                    }
+                    break;
+                case 'B':
+                    //When we find a BLUE arrow
+                    // cout << "I'm a " << vertexes[i].color << " vertex at " << vertexes[i].id << endl;
+                    for(j = i; j <= 63; j += 8)
+                    {
+                        edgeWeight++;
+                        if(vertexes[j].color == 'R')
+                        {
+                            //Add edge between i and j with weight
+                            edge = add_edge(vertexes[i].id, vertexes[j].id, EdgeWeightProperty(edgeWeight), graph);
+                            // cout << "Found a " << vertexes[j].color
+                            // << " at vertex " << vertexes[j].id
+                            // << " with edge weight: " << edgeWeight << endl;
+                        }
+                        else if(vertexes[j].color == 'O')
+                        {
+                            //Target FOUND add edge between i and j with weight
+                            edge = add_edge(vertexes[i].id, vertexes[j].id, EdgeWeightProperty(edgeWeight), graph);
+                            // cout << "FOUND TARGET " << vertexes[j].color
+                            // << " at vertex " << vertexes[j].id
+                            // << " with edge weight: " << edgeWeight << endl;
+                        }
+                    }
+                    break;
+            }
+        }
+        else if (vertexes[i].direction.compare("NW") == 0)
+        {
+            //variable x to track horizontal movement, edgeWeight for weight
+            int x, edgeWeight = -1;
+            // cout << "\nFound: " << vertexes[i].direction << endl;
+            switch(vertexes[i].color)
+            {
+                case 'R':
+                    //When we find a RED arrow
+                    // cout << "I'm a " << vertexes[i].color << " vertex at " << vertexes[i].id << endl;
+                    for(j = i, x = i; j >= 0 && x >= (i/totalColumns) * totalColumns; j -= 9, x--)
+                    {
+                        edgeWeight++;
+                        if(vertexes[j].color == 'B')
+                        {
+                            //Add edge between i and j with weight
+                            edge = add_edge(vertexes[i].id, vertexes[j].id, EdgeWeightProperty(edgeWeight), graph);
+                            // cout << "Found a " << vertexes[j].color
+                            // << " at vertex " << vertexes[j].id
+                            // << " with edge weight: " << edgeWeight << endl;
+                        }
+                        else if(vertexes[j].color == 'O')
+                        {
+                            //Probably NEVER find this
+                            cout << "FOUND TARGET " << vertexes[j].color << " at vertex " << vertexes[j].id << endl;
+                        }
+                    }
+                    break;
+                case 'B':
+                    //When we find a BLUE arrow
+                    // cout << "I'm a " << vertexes[i].color << " vertex at " << vertexes[i].id << endl;
+                    for(j = i, x = i; j >= 0 && x >= (i/totalColumns) * totalColumns; j -= 9, x--)
+                    {
+                        edgeWeight++;
+                        if(vertexes[j].color == 'R')
+                        {
+                            //Add edge between i and j with weight
+                            edge = add_edge(vertexes[i].id, vertexes[j].id, EdgeWeightProperty(edgeWeight), graph);
+                            // cout << "Found a " << vertexes[j].color
+                            // << " at vertex " << vertexes[j].id
+                            // << " with edge weight: " << edgeWeight << endl;
+                        }
+                        else if(vertexes[j].color == 'O')
+                        {
+                            //Probably NEVER find this
+                            cout << "FOUND TARGET " << vertexes[j].color << " at vertex " << vertexes[j].id << endl;
+                        }
+                    }
+                    break;
+            }
+        }
+        else if(vertexes[i].direction.compare("SE") == 0)
+        {
+            //variable x to track horizontal movement, edgeWeight for weight
+            int x, edgeWeight = -1;
+            // cout << "\nFound: " << vertexes[i].direction << endl;
+            switch(vertexes[i].color)
+            {
+                case 'R':
+                    //When we find a RED arrow
+                    // cout << "I'm a " << vertexes[i].color << " vertex at " << vertexes[i].id << endl;
+                    for(j = i, x = i; j <= 63 && x < (totalRows + i) - (i % totalRows) ; j += 9, x++)
+                    {
+                        edgeWeight++;
+                        if(vertexes[j].color == 'B')
+                        {
+                            //Add edge between i and j with weight
+                            edge = add_edge(vertexes[i].id, vertexes[j].id, EdgeWeightProperty(edgeWeight), graph);
+                            // cout << "Found a " << vertexes[j].color
+                            // << " at vertex " << vertexes[j].id
+                            // << " with edge weight: " << edgeWeight << endl;
+                        }
+                        else if(vertexes[j].color == 'O')
+                        {
+                            //Target FOUND add edge between i and j with weight
+                            edge = add_edge(vertexes[i].id, vertexes[j].id, EdgeWeightProperty(edgeWeight), graph);
+                            // cout << "FOUND TARGET " << vertexes[j].color
+                            // << " at vertex " << vertexes[j].id
+                            // << " with edge weight: " << edgeWeight << endl;
+                        }
+                    }
+                    break;
+                case 'B':
+                    //When we find a BLUE arrow
+                    // cout << "I'm a " << vertexes[i].color << " vertex at " << vertexes[i].id << endl;
+                    for(j = i, x = i; j <= 63 && x < (totalRows + i) - (i % totalRows) ; j += 9, x++)
+                    {
+                        edgeWeight++;
+                        if(vertexes[j].color == 'R')
+                        {
+                            //Add edge between i and j with weight
+                            edge = add_edge(vertexes[i].id, vertexes[j].id, EdgeWeightProperty(edgeWeight), graph);
+                            // cout << "Found a " << vertexes[j].color
+                            // << " at vertex " << vertexes[j].id
+                            // << " with edge weight: " << edgeWeight << endl;
+                        }
+                        else if(vertexes[j].color == 'O')
+                        {
+                            //Target FOUND add edge between i and j with weight
+                            edge = add_edge(vertexes[i].id, vertexes[j].id, EdgeWeightProperty(edgeWeight), graph);
+                            // cout << "FOUND TARGET " << vertexes[j].color
+                            // << " at vertex " << vertexes[j].id
+                            // << " with edge weight: " << edgeWeight << endl;
+                        }
+                    }
+                    break;
+            }
+        }
+        else if(vertexes[i].direction.compare("NE") == 0)
+        {
+            // cout << "\nFound: " << vertexes[i].direction << endl;
+            //variable x to track horizontal movement, edgeWeight for weight
+            int x, edgeWeight = -1;
+            switch(vertexes[i].color)
+            {
+                case 'R':
+                    //When we find a RED arrow
+                    // cout << "I'm a " << vertexes[i].color << " vertex at " << vertexes[i].id << endl;
+                    for(j = i, x = i; j >= 0 && x < (totalRows + i) - (i % totalRows) ; j -= 7, x++)
+                    {
+                        edgeWeight++;
+                        if(vertexes[j].color == 'B')
+                        {
+                            //Add edge between i and j with weight
+                            edge = add_edge(vertexes[i].id, vertexes[j].id, EdgeWeightProperty(edgeWeight), graph);
+                            // cout << "Found a " << vertexes[j].color
+                            // << " at vertex " << vertexes[j].id
+                            // << " with edge weight: " << edgeWeight << endl;
+                        }
+                        else if(vertexes[j].color == 'O')
+                        {
+                            //Probably NEVER find this
+                            cout << "FOUND TARGET " << vertexes[j].color << " at vertex " << vertexes[j].id << endl;
+                        }
+                    }
+                    break;
+                case 'B':
+                    //When we find a BLUE arrow
+                    // cout << "I'm a " << vertexes[i].color << " vertex at " << vertexes[i].id << endl;
+                    for(j = i, x = i; j >= 0 && x < (totalRows + i) - (i % totalRows) ; j -= 7, x++)
+                    {
+                        edgeWeight++;
+                        if(vertexes[j].color == 'R')
+                        {
+                            //Add edge between i and j with weight
+                            edge = add_edge(vertexes[i].id, vertexes[j].id, EdgeWeightProperty(edgeWeight), graph);
+                            // cout << "Found a " << vertexes[j].color
+                            // << " at vertex " << vertexes[j].id
+                            // << " with edge weight: " << edgeWeight << endl;
+                        }
+                        else if(vertexes[j].color == 'O')
+                        {
+                            //Probably NEVER find this
+                            cout << "FOUND TARGET " << vertexes[j].color << " at vertex " << vertexes[j].id << endl;
+                        }
+                    }
+                    break;
+            }
+        }
+        else if(vertexes[i].direction.compare("SW") == 0)
+        {
+            //variable x to track horizontal movement, edgeWeight for weight
+            int x, edgeWeight = -1;
+            // cout << "\nFound: " << vertexes[i].direction << endl;
+            switch(vertexes[i].color)
+            {
+                case 'R':
+                    //When we find a RED arrow
+                    // cout << "I'm a " << vertexes[i].color << " vertex at " << vertexes[i].id << endl;
+                    for(j = i, x = i; j <= 63 && x >= (i/totalColumns) * totalColumns; j += 7, x--)
+                    {
+                        edgeWeight++;
+                        if(vertexes[j].color == 'B')
+                        {
+                            //Add edge between i and j with weight
+                            edge = add_edge(vertexes[i].id, vertexes[j].id, EdgeWeightProperty(edgeWeight), graph);
+                            // cout << "Found a " << vertexes[j].color
+                            // << " at vertex " << vertexes[j].id
+                            // << " with edge weight: " << edgeWeight << endl;
+                        }
+                        else if(vertexes[j].color == 'O')
+                        {
+                            //Probably NEVER find this
+                            cout << "FOUND TARGET " << vertexes[j].color << " at vertex " << vertexes[j].id << endl;
+                        }
+                    }
+                    break;
+                case 'B':
+                    //When we find a BLUE arrow
+                    // cout << "I'm a " << vertexes[i].color << " vertex at " << vertexes[i].id << endl;
+                    for(j = i, x = i; j <= 63 && x >= (i/totalColumns) * totalColumns; j += 7, x--)
+                    {
+                        edgeWeight++;
+                        if(vertexes[j].color == 'R')
+                        {
+                            //Add edge between i and j with weight
+                            edge = add_edge(vertexes[i].id, vertexes[j].id, EdgeWeightProperty(edgeWeight), graph);
+                            // cout << "Found a " << vertexes[j].color
+                            // << " at vertex " << vertexes[j].id
+                            // << " with edge weight: " << edgeWeight << endl;
+                        }
+                        else if(vertexes[j].color == 'O')
+                        {
+                            //Probably NEVER found
+                            cout << "FOUND TARGET " << vertexes[j].color << " at vertex " << vertexes[j].id << endl;
+                        }
+                    }
+                    break;
+            }
         }
     }
 
@@ -149,7 +599,17 @@ int main()
 
 
 
+    //Prints all vertices in the map and weight of edges connected b/w them
+    cout << "Source" << "\tTarget" << "\tWeight" << endl;
+    for(tie(edge_it, edge_end) = boost::edges(graph); edge_it != edge_end; ++edge_it)
+    {
+        cout << boost::source(*edge_it, graph) << "\t"
+             << boost::target(*edge_it, graph) << "\t"
+             << EdgeWeightMap[*edge_it] << endl;
+    }
 
+
+/*
     //Define a new type for simplicity. This will be a vertex iterator type
     typedef boost::adjacency_list<>::vertex_iterator vertIterator;
 
@@ -161,7 +621,7 @@ int main()
     {
         //cout << *it << endl;
     }
-
+*/
 
 
 
