@@ -1,22 +1,91 @@
 #include<iostream>
 #include<stdlib.h>
 #include<stdexcept>
-#include<cmath>
 #include<string>
 #include<fstream>
 #include<vector>
+#include<stack>
 #include<boost/graph/adjacency_list.hpp>
+#include<boost/graph/breadth_first_search.hpp>
+//For Version 1
+#include<boost/pending/indirect_cmp.hpp> //NEEDED?
+#include<boost/range/irange.hpp> //NEEDED?
+//For Version 2
+#include <algorithm>
+#include <utility>
+#include <boost/config.hpp>
+#include <boost/graph/visitors.hpp>
+#include <boost/property_map/property_map.hpp>
+#include <boost/graph/graph_utility.hpp>
+
+
 
 //Change file name here if needed.
 #define FILENAME "apollodiana.txt"
 
-using namespace std;
+//==============================FOR VERSION 1=================================//
+/*
+template < typename TimeMap > class bfs_time_visitor:public boost::default_bfs_visitor
+{
+    typedef typename boost::property_traits < TimeMap >::value_type T;
+public:
+    bfs_time_visitor(TimeMap tmap, T & t):m_timemap(tmap), m_time(t) { }
+    template < typename Vertex, typename Graph >
+    void discover_vertex(Vertex u, const Graph & g) const
+    {
+        put(m_timemap, u, m_time++);
+    }
+    TimeMap m_timemap;
+    T & m_time;
+};
+*/
+//============================================================================//
 
-struct vertex
+//==============================FOR VERSION 2=================================//
+
+template <class ParentDecorator>
+struct print_parent {
+  print_parent(const ParentDecorator& p_) : p(p_) { }
+  template <class Vertex>
+  void operator()(const Vertex& v) const {
+    std::cout << "parent[" << v << "] = " <<  p[v]  << std::endl;
+  }
+  ParentDecorator p;
+};
+
+template <class NewGraph, class Tag>
+struct graph_copier
+  : public boost::base_visitor<graph_copier<NewGraph, Tag> >
+{
+  typedef Tag event_filter;
+
+  graph_copier(NewGraph& graph) : new_g(graph) { }
+
+  template <class Edge, class Graph>
+  void operator()(Edge e, Graph& g) {
+    boost::add_edge(boost::source(e, g), boost::target(e, g), new_g);
+  }
+private:
+  NewGraph& new_g;
+};
+
+template <class NewGraph, class Tag>
+inline graph_copier<NewGraph, Tag>
+copy_graph(NewGraph& g, Tag) {
+  return graph_copier<NewGraph, Tag>(g);
+}
+
+//============================================================================//
+
+using namespace std;
+struct vert
 {
     boost::adjacency_list<>::vertex_descriptor id;
     char color;
     string direction;
+
+    //Vector of maps that stores the target vertex and the edge weight to it
+    vector <  pair<boost::adjacency_list<>::vertex_descriptor, int> > target;
 };
 
 //===================================TO DO====================================//
@@ -55,7 +124,7 @@ int main()
     boost::graph_traits< Graph >::edge_iterator edge_it, edge_end;
 
     /*
-    vertex v1, v2, v3, v4;
+    vert v1, v2, v3, v4;
     boost::adjacency_list<> graph;
 
     v1.id = add_vertex(graph);
@@ -112,7 +181,7 @@ int main()
          << endl;
 
     //Create an array of vertex structures, an array of vertices
-    vertex vertexes[totalVertices];
+    vert vertexes[totalVertices];
 
     for(int i = 0; i < totalRows*totalColumns; i++)
     {
@@ -577,7 +646,7 @@ int main()
                             //Add edge between i and j with weight
                             edge = add_edge(vertexes[i].id, vertexes[j].id, EdgeWeightProperty(edgeWeight), graph);
                             // cout << "Found a " << vertexes[j].color
-                            // << " at vertex " << vertexes[j].id
+                            // << " at vertex " << vertexid <es[j].id
                             // << " with edge weight: " << edgeWeight << endl;
                         }
                         else if(vertexes[j].color == 'O')
@@ -597,16 +666,248 @@ int main()
 
 
     //Prints all vertices in the map and weight of edges connected b/w them
-    cout << "Source" << "\tTarget" << "\tWeight" << endl;
-    for(tie(edge_it, edge_end) = boost::edges(graph); edge_it != edge_end; ++edge_it)
+    // cout << "Source" << "\tTarget" << "\tWeight" << endl;
+    // for(tie(edge_it, edge_end) = boost::edges(graph); edge_it != edge_end; ++edge_it)
+    // {
+    //     cout << boost::source(*edge_it, graph) << "\t"
+    //          << boost::target(*edge_it, graph) << "\t"
+    //          << EdgeWeightMap[*edge_it] << endl;
+    // }
+
+
+
+//==========================GET BFS WORKING V1================================//
+/*
+    typedef boost::graph_traits < Graph >::vertices_size_type Size;
+    vector < Size > dtime(num_vertices(graph));
+    typedef boost::iterator_property_map<vector<Size>::iterator,
+                                         boost::property_map<Graph, boost::vertex_index_t>::const_type> dtime_pm_type;
+
+    dtime_pm_type dtime_pm(dtime.begin(), get(boost::vertex_index, graph));
+
+    Size time = 0;
+    bfs_time_visitor < dtime_pm_type >vis(dtime_pm, time);
+
+    //call BFS
+    breadth_first_search(graph, vertexes[0].id, visitor(vis));
+
+    //Now sort the order of vertices by their discovery time
+    vector<boost::graph_traits<Graph>::vertices_size_type> discover_order(vertexes[63].id);
+    boost::integer_range < int >range(0, 64);
+    copy(range.begin(), range.end(), discover_order.begin());
+
+    sort(discover_order.begin(), discover_order.end(), boost::indirect_cmp
+        < dtime_pm_type, less <Size > >(dtime_pm));
+
+    for(unsigned int i = 0; i <= 63; i++)
     {
-        cout << boost::source(*edge_it, graph) << "\t"
-             << boost::target(*edge_it, graph) << "\t"
-             << EdgeWeightMap[*edge_it] << endl;
+        cout << "i = " << i << "\tdtime_pm = " << dtime_pm[i] << endl;
     }
 
 
+    //Print the order of discovery
+    //cout << "Size of vertexes: " << sizeof(vertexes)/sizeof(vertexes[0]) << endl;
+    cout << "\nOrder of discovery: ";
+    for (unsigned int i = 0; i <= vertexes[63].id; ++i)
+    {
+        cout << vertexes[discover_order[i]].id << " ";
+    }
+    cout << endl << endl;
+
+    boost::print_graph(graph);
+*/
+//============================================================================//
+
+//=========================GET BFS WORKING V2=================================//
+
+    //edge = add_edge(vertexes[63].id, vertexes[63].id, EdgeWeightProperty(0), graph);
+    Graph G_copy(num_vertices(graph));
+    typedef Graph::vertex_descriptor Vertex;
+    // The source vertex
+    Vertex s = *(boost::vertices(graph).first);
+
+    // Array to store predecessor (parent) of each vertex. This will be
+    // used as a Decorator (actually, its iterator will be).
+    std::vector<Vertex> p(boost::num_vertices(graph));
+
+    // VC++ version of std::vector has no ::pointer, so
+    // I use ::value_type* instead.
+    typedef std::vector<Vertex>::value_type* Piter; //NEEDED??
+
+    boost::graph_traits<Graph>::vertices_size_type d[63];
+    std::fill_n(d, 63, 0);
+
+     p[s] = s;
+
 /*
+    //Call BFS
+    boost::breadth_first_search
+    (graph, s,
+    boost::visitor(boost::make_bfs_visitor
+    (std::make_pair(boost::record_distances(d, boost::on_tree_edge()),
+                    std::make_pair
+                    (boost::record_predecessors(&p[0], boost::on_tree_edge()),
+                     copy_graph(G_copy, boost::on_examine_edge())))) ));
+*/
+
+    //Call BFS
+    boost::breadth_first_search
+    (graph, s,
+    boost::visitor(boost::make_bfs_visitor
+    (std::make_pair(boost::record_distances(d, boost::on_tree_edge()),
+                    std::make_pair
+                    (boost::record_predecessors(&p[0], boost::on_tree_edge()),
+                     copy_graph(G_copy, boost::on_examine_edge())))) ));
+
+    //Print it
+    cout << endl;
+    //boost::print_graph(graph);
+    cout << endl;
+
+    //boost::print_graph(G_copy);
+
+    //cout << boost::num_vertices(graph);
+
+    if (boost::num_vertices(graph) <= boost::num_vertices(graph))
+    {
+        std::cout << "distances: ";
+        #ifdef BOOST_OLD_STREAM_ITERATORS
+        std::copy(d, d + 5, std::ostream_iterator<int, char>(std::cout, " "));
+        #else
+        std::copy(d, d + 5, std::ostream_iterator<int>(std::cout, " "));
+        #endif
+        std::cout << std::endl;
+
+        std::for_each(boost::vertices(graph).first, boost::vertices(graph).second,
+                     print_parent<Piter>(&p[0]));
+
+
+        //cout << "End: " << boost::vertices(graph).end << endl;;
+        Vertex end;
+        vector <Vertex> predecessors;
+        for(end = vertex(totalRows*totalColumns - 1, graph); end != vertex(0, graph); end = p[end])
+        {
+            //cout << "end: " << end << endl;
+            predecessors.push_back(end);
+        }
+        predecessors.push_back(end);
+        //cout << "end: " << end << endl;
+
+        for(unsigned int i = 0; i < predecessors.size(); i++)
+        {
+            if(predecessors[i] == 0)
+            {
+                continue;
+            }
+            cout << "\nNode: " << predecessors[i]
+                 << "\t Parent: " << predecessors[i+1] << endl;
+        }
+
+        for(unsigned int i = 0; i < predecessors.size(); i++)
+        {
+            if(predecessors[i] == 0)
+                continue;
+            pair<Vertex, int> tempPair;
+            pair < map<Vertex, int>::iterator, bool > result;
+            cout << "\nNode = " << predecessors[i]
+                 << "\tParent = " << predecessors[i+1] << endl;
+
+            tempPair.first = predecessors[i+1];
+            vertexes[predecessors[i]].target.push_back(tempPair);
+            cout << "Added sucesfully" << endl;
+            cout << "Vertex: " << vertexes[predecessors[i]].id
+                 << "\tParent: "
+                 << vertexes[predecessors[i]].target[0].first
+                 << endl;
+            //<<vertexes[predecessors[i]].target.at(0)[predecessors[i+1]]
+        }
+    }
+
+     cout << "Source" << "\tTarget" << "\tWeight" << endl;
+     for(tie(edge_it, edge_end) = boost::edges(graph); edge_it != edge_end; ++edge_it)
+     {
+         cout << boost::source(*edge_it, graph) << "\t"
+              << boost::target(*edge_it, graph) << "\t"
+              << EdgeWeightMap[*edge_it] << endl;
+
+              cout << "Vertex: "
+              << vertexes[boost::source(*edge_it, graph)].id << endl;
+
+              if(vertexes[boost::source(*edge_it, graph)].target.size() > 0)
+              {
+                  cout << "Targets exist" << endl;
+                  cout << "Parent: "
+                  << vertexes[boost::source(*edge_it, graph)].target[0].first
+                  << endl;
+              }
+              else
+              {
+                  cout << "Target does NOT exist" << endl;
+              }
+
+              /*if(vertexes[boost::source(*edge_it, graph)].id)
+              {
+                  cout << "Would have SEGFAULTED" << endl;
+              }
+              else
+              {
+                  cout << "Vertex "
+                  << vertexes[boost::source(*edge_it, graph)].id;
+                  if(!vertexes[boost::source(*edge_it, graph)].target[0].first)
+                  {
+                      cout << "Would have SEGFAULTED" << endl;
+                  }
+                  else
+                  {
+                      cout << " with Target: "
+                      << vertexes[boost::source(*edge_it, graph)].target[0].first << endl;
+                  }
+              }*/
+     }
+
+
+
+
+
+
+
+
+//============================================================================//
+
+//=========================GET BFS WORKING V3=================================//
+/*
+    struct my_null_visitor
+    {
+        typedef on_no_event event_filter;
+        template <class T, class Graph>
+        void operator()(T, Graph&) {}
+    };
+
+    //breadth_first_search(graph, vertexes[0].id, visitor(vis));
+
+
+    vector<boost::graph_traits<Graph>::vertices_size_type> discover_order(vertexes[63].id);
+    boost::integer_range < int >range(0, 64);
+    copy(range.begin(), range.end(), discover_order.begin());
+
+    cout << "\nOrder of discovery: ";
+    for (unsigned int i = 0; i <= vertexes[63].id; ++i)
+    {
+        cout << vertexes[discover_order[i]].id << " ";
+    }
+*/
+//============================================================================//
+
+
+
+
+
+
+
+
+
+
+
     //Define a new type for simplicity. This will be a vertex iterator type
     typedef boost::adjacency_list<>::vertex_iterator vertIterator;
 
@@ -618,7 +919,7 @@ int main()
     {
         //cout << *it << endl;
     }
-*/
+
 
 
 
