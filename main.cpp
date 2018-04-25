@@ -803,7 +803,8 @@ int main()
                  << "\t Parent: " << predecessors[i+1] << endl;
         }
 
-        for(unsigned int i = 0; i < predecessors.size(); i++)
+
+        /*for(unsigned int i = 0; i < predecessors.size(); i++)
         {
             if(predecessors[i] == 0)
                 continue;
@@ -820,50 +821,52 @@ int main()
                  << vertexes[predecessors[i]].target[0].first
                  << endl;
             //<<vertexes[predecessors[i]].target.at(0)[predecessors[i+1]]
-        }
+        }*/
     }
 
-     cout << "Source" << "\tTarget" << "\tWeight" << endl;
-     for(tie(edge_it, edge_end) = boost::edges(graph); edge_it != edge_end; ++edge_it)
-     {
-         cout << boost::source(*edge_it, graph) << "\t"
-              << boost::target(*edge_it, graph) << "\t"
-              << EdgeWeightMap[*edge_it] << endl;
+    cout << "\nSource" << "\tTarget" << "\tWeight" << endl;
+    for(tie(edge_it, edge_end) = boost::edges(graph); edge_it != edge_end; ++edge_it)
+    {
+        cout << boost::source(*edge_it, graph) << "\t"
+             << boost::target(*edge_it, graph) << "\t"
+             << EdgeWeightMap[*edge_it] << endl;
 
-              cout << "Vertex: "
-              << vertexes[boost::source(*edge_it, graph)].id << endl;
+        pair<Vertex, int> tempPair;
+        cout << "Adding: " << boost::target(*edge_it, graph)
+        << " to "
+        << vertexes[boost::source(*edge_it, graph)].id
+        << " with weight: "
+        << EdgeWeightMap[*edge_it] << endl;
+        tempPair.first = boost::target(*edge_it, graph);
+        tempPair.second = EdgeWeightMap[*edge_it];
+        vertexes[boost::source(*edge_it, graph)].target.push_back(tempPair);
 
-              if(vertexes[boost::source(*edge_it, graph)].target.size() > 0)
+        int vecSize = vertexes[boost::source(*edge_it, graph)].target.size();
+        cout << "Current vector size for node "
+        << vertexes[boost::source(*edge_it, graph)].id
+        << " is: " << vecSize << endl;
+        cout << "Added the following:"
+        << "\nNode: "
+        << vertexes[boost::source(*edge_it, graph)].id
+        << "\tTarget: "
+        << vertexes[boost::source(*edge_it, graph)].target[vecSize-1].first
+        << "\tEdge Weight: "
+        << vertexes[boost::source(*edge_it, graph)].target[vecSize-1].second
+        << endl << endl;
+
+
+              /*if(vertexes[boost::target(*edge_it, graph)].target.size() > 0)
               {
                   cout << "Targets exist" << endl;
-                  cout << "Parent: "
-                  << vertexes[boost::source(*edge_it, graph)].target[0].first
+                  cout << "Parent of target: "
+                  << vertexes[boost::target(*edge_it, graph)].target[0].first
                   << endl;
               }
               else
               {
                   cout << "Target does NOT exist" << endl;
-              }
-
-              /*if(vertexes[boost::source(*edge_it, graph)].id)
-              {
-                  cout << "Would have SEGFAULTED" << endl;
-              }
-              else
-              {
-                  cout << "Vertex "
-                  << vertexes[boost::source(*edge_it, graph)].id;
-                  if(!vertexes[boost::source(*edge_it, graph)].target[0].first)
-                  {
-                      cout << "Would have SEGFAULTED" << endl;
-                  }
-                  else
-                  {
-                      cout << " with Target: "
-                      << vertexes[boost::source(*edge_it, graph)].target[0].first << endl;
-                  }
               }*/
-     }
+    }
 
 
 
