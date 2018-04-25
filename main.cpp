@@ -183,7 +183,7 @@ int main()
     //Create an array of vertex structures, an array of vertices
     vert vertexes[totalVertices];
 
-    for(int i = 0; i < totalRows*totalColumns; i++)
+    for(int i = 0; i < totalVertices; i++)
     {
         //Add vertex to graph
         vertexes[i].id = add_vertex(graph);
@@ -202,14 +202,21 @@ int main()
         }
         else
         {
-            if(i == 63)
+            if(i == totalVertices - 1)
+            {
+                cout << "Skipping i = " << i << endl;
+                cout << "vertexID: " << vertexes[i].id
+                     << "\tcolor: "  << vertexes[i].color
+                     << "\tdirection: " << vertexes[i].direction << endl;
                 continue;
+            }
+
             //Direction is N, E, S, W
             vertexes[i].direction = tempStr[2];
         }
-        // cout << "vertexID: " << vertexes[i].id
-        //      << "\tcolor: "  << vertexes[i].color
-        //      << "\tdirection: " << vertexes[i].direction << endl;
+        cout << "vertexID: " << vertexes[i].id
+             << "\tcolor: "  << vertexes[i].color
+             << "\tdirection: " << vertexes[i].direction << endl;
     }
 
     // cout << "Target ID: " << vertexes[63].id
@@ -220,7 +227,7 @@ int main()
 
 
     //For loop to add correct edges between vertices
-    for(int i = 0; i < totalRows * totalColumns; i++)
+    for(int i = 0; i < totalVertices; i++)
     {
         //Variable j to keep track of vertex we're connecting an edge to
         int j;
@@ -309,6 +316,7 @@ int main()
                         else if(vertexes[j].color == 'O')
                         {
                             //probably NEVER find this
+                            edge = add_edge(vertexes[i].id, vertexes[j].id, EdgeWeightProperty(edgeWeight), graph);
                             cout << "FOUND TARGET " << vertexes[j].color << " at vertex " << vertexes[j].id << endl;
                         }
                     }
@@ -334,6 +342,7 @@ int main()
                         else if(vertexes[j].color == 'O')
                         {
                             //probably NEVER find this
+                            edge = add_edge(vertexes[i].id, vertexes[j].id, EdgeWeightProperty(edgeWeight), graph);
                             cout << "FOUND TARGET " << vertexes[j].color << " at vertex " << vertexes[j].id << endl;
                         }
                     }
@@ -350,7 +359,7 @@ int main()
                 case 'R':
                     //When we find a RED arrow
                     // cout << "I'm a " << vertexes[i].color << " vertex at " << vertexes[i].id << endl;
-                    for(j = i; j >= 0; j -= 8)
+                    for(j = i; j >= 0; j -= totalRows)
                     {
                         edgeWeight++;
                         if(vertexes[j].color == 'B')
@@ -364,6 +373,7 @@ int main()
                         else if(vertexes[j].color == 'O')
                         {
                             //Probably NEVER find this
+                            edge = add_edge(vertexes[i].id, vertexes[j].id, EdgeWeightProperty(edgeWeight), graph);
                             cout << "FOUND TARGET " << vertexes[j].color << " at vertex " << vertexes[j].id << endl;
                         }
                     }
@@ -371,7 +381,7 @@ int main()
                 case 'B':
                     //When we find a BLUE arrow
                     // cout << "I'm a " << vertexes[i].color << " vertex at " << vertexes[i].id << endl;
-                    for(j = i; j >= 0; j -= 8)
+                    for(j = i; j >= 0; j -= totalRows)
                     {
                         edgeWeight++;
                         if(vertexes[j].color == 'R')
@@ -385,6 +395,7 @@ int main()
                         else if(vertexes[j].color == 'O')
                         {
                             //Probably NEVER find this
+                            edge = add_edge(vertexes[i].id, vertexes[j].id, EdgeWeightProperty(edgeWeight), graph);
                             cout << "FOUND TARGET " << vertexes[j].color << " at vertex " << vertexes[j].id << endl;
                         }
                     }
@@ -401,7 +412,7 @@ int main()
                 case 'R':
                     //When we find a RED arrow
                     // cout << "I'm a " << vertexes[i].color << " vertex at " << vertexes[i].id << endl;
-                    for(j = i; j <= 63; j += 8)
+                    for(j = i; j <= totalVertices - 1; j += totalRows)
                     {
                         edgeWeight++;
                         if(vertexes[j].color == 'B')
@@ -425,7 +436,7 @@ int main()
                 case 'B':
                     //When we find a BLUE arrow
                     // cout << "I'm a " << vertexes[i].color << " vertex at " << vertexes[i].id << endl;
-                    for(j = i; j <= 63; j += 8)
+                    for(j = i; j <= totalVertices - 1; j += totalRows)
                     {
                         edgeWeight++;
                         if(vertexes[j].color == 'R')
@@ -458,7 +469,7 @@ int main()
                 case 'R':
                     //When we find a RED arrow
                     // cout << "I'm a " << vertexes[i].color << " vertex at " << vertexes[i].id << endl;
-                    for(j = i, x = i; j >= 0 && x >= (i/totalColumns) * totalColumns; j -= 9, x--)
+                    for(j = i, x = i; j >= 0 && x >= (i/totalColumns) * totalColumns; j -= totalRows + 1, x--)
                     {
                         edgeWeight++;
                         if(vertexes[j].color == 'B')
@@ -472,6 +483,7 @@ int main()
                         else if(vertexes[j].color == 'O')
                         {
                             //Probably NEVER find this
+                            edge = add_edge(vertexes[i].id, vertexes[j].id, EdgeWeightProperty(edgeWeight), graph);
                             cout << "FOUND TARGET " << vertexes[j].color << " at vertex " << vertexes[j].id << endl;
                         }
                     }
@@ -479,7 +491,7 @@ int main()
                 case 'B':
                     //When we find a BLUE arrow
                     // cout << "I'm a " << vertexes[i].color << " vertex at " << vertexes[i].id << endl;
-                    for(j = i, x = i; j >= 0 && x >= (i/totalColumns) * totalColumns; j -= 9, x--)
+                    for(j = i, x = i; j >= 0 && x >= (i/totalColumns) * totalColumns; j -= totalRows + 1, x--)
                     {
                         edgeWeight++;
                         if(vertexes[j].color == 'R')
@@ -493,6 +505,7 @@ int main()
                         else if(vertexes[j].color == 'O')
                         {
                             //Probably NEVER find this
+                            edge = add_edge(vertexes[i].id, vertexes[j].id, EdgeWeightProperty(edgeWeight), graph);
                             cout << "FOUND TARGET " << vertexes[j].color << " at vertex " << vertexes[j].id << endl;
                         }
                     }
@@ -509,7 +522,7 @@ int main()
                 case 'R':
                     //When we find a RED arrow
                     // cout << "I'm a " << vertexes[i].color << " vertex at " << vertexes[i].id << endl;
-                    for(j = i, x = i; j <= 63 && x < (totalRows + i) - (i % totalRows) ; j += 9, x++)
+                    for(j = i, x = i; j <= totalVertices - 1 && x < (totalRows + i) - (i % totalRows) ; j += totalRows + 1, x++)
                     {
                         edgeWeight++;
                         if(vertexes[j].color == 'B')
@@ -533,7 +546,7 @@ int main()
                 case 'B':
                     //When we find a BLUE arrow
                     // cout << "I'm a " << vertexes[i].color << " vertex at " << vertexes[i].id << endl;
-                    for(j = i, x = i; j <= 63 && x < (totalRows + i) - (i % totalRows) ; j += 9, x++)
+                    for(j = i, x = i; j <= totalVertices && x < (totalRows + i) - (i % totalRows) ; j += totalRows + 1, x++)
                     {
                         edgeWeight++;
                         if(vertexes[j].color == 'R')
@@ -566,7 +579,7 @@ int main()
                 case 'R':
                     //When we find a RED arrow
                     // cout << "I'm a " << vertexes[i].color << " vertex at " << vertexes[i].id << endl;
-                    for(j = i, x = i; j >= 0 && x < (totalRows + i) - (i % totalRows) ; j -= 7, x++)
+                    for(j = i, x = i; j >= 0 && x < (totalRows + i) - (i % totalRows) ; j -= totalRows - 1, x++)
                     {
                         edgeWeight++;
                         if(vertexes[j].color == 'B')
@@ -580,6 +593,7 @@ int main()
                         else if(vertexes[j].color == 'O')
                         {
                             //Probably NEVER find this
+                            edge = add_edge(vertexes[i].id, vertexes[j].id, EdgeWeightProperty(edgeWeight), graph);
                             cout << "FOUND TARGET " << vertexes[j].color << " at vertex " << vertexes[j].id << endl;
                         }
                     }
@@ -587,7 +601,7 @@ int main()
                 case 'B':
                     //When we find a BLUE arrow
                     // cout << "I'm a " << vertexes[i].color << " vertex at " << vertexes[i].id << endl;
-                    for(j = i, x = i; j >= 0 && x < (totalRows + i) - (i % totalRows) ; j -= 7, x++)
+                    for(j = i, x = i; j >= 0 && x < (totalRows + i) - (i % totalRows) ; j -= totalRows - 1, x++)
                     {
                         edgeWeight++;
                         if(vertexes[j].color == 'R')
@@ -601,6 +615,7 @@ int main()
                         else if(vertexes[j].color == 'O')
                         {
                             //Probably NEVER find this
+                            edge = add_edge(vertexes[i].id, vertexes[j].id, EdgeWeightProperty(edgeWeight), graph);
                             cout << "FOUND TARGET " << vertexes[j].color << " at vertex " << vertexes[j].id << endl;
                         }
                     }
@@ -617,7 +632,7 @@ int main()
                 case 'R':
                     //When we find a RED arrow
                     // cout << "I'm a " << vertexes[i].color << " vertex at " << vertexes[i].id << endl;
-                    for(j = i, x = i; j <= 63 && x >= (i/totalColumns) * totalColumns; j += 7, x--)
+                    for(j = i, x = i; j <= totalVertices - 1 && x >= (i/totalColumns) * totalColumns; j += totalRows - 1, x--)
                     {
                         edgeWeight++;
                         if(vertexes[j].color == 'B')
@@ -631,6 +646,7 @@ int main()
                         else if(vertexes[j].color == 'O')
                         {
                             //Probably NEVER find this
+                            edge = add_edge(vertexes[i].id, vertexes[j].id, EdgeWeightProperty(edgeWeight), graph);
                             cout << "FOUND TARGET " << vertexes[j].color << " at vertex " << vertexes[j].id << endl;
                         }
                     }
@@ -638,7 +654,7 @@ int main()
                 case 'B':
                     //When we find a BLUE arrow
                     // cout << "I'm a " << vertexes[i].color << " vertex at " << vertexes[i].id << endl;
-                    for(j = i, x = i; j <= 63 && x >= (i/totalColumns) * totalColumns; j += 7, x--)
+                    for(j = i, x = i; j <= totalVertices - 1 && x >= (i/totalColumns) * totalColumns; j += totalRows - 1, x--)
                     {
                         edgeWeight++;
                         if(vertexes[j].color == 'R')
@@ -652,6 +668,7 @@ int main()
                         else if(vertexes[j].color == 'O')
                         {
                             //Probably NEVER found
+                            edge = add_edge(vertexes[i].id, vertexes[j].id, EdgeWeightProperty(edgeWeight), graph);
                             cout << "FOUND TARGET " << vertexes[j].color << " at vertex " << vertexes[j].id << endl;
                         }
                     }
@@ -666,13 +683,13 @@ int main()
 
 
     //Prints all vertices in the map and weight of edges connected b/w them
-    // cout << "Source" << "\tTarget" << "\tWeight" << endl;
-    // for(tie(edge_it, edge_end) = boost::edges(graph); edge_it != edge_end; ++edge_it)
-    // {
-    //     cout << boost::source(*edge_it, graph) << "\t"
-    //          << boost::target(*edge_it, graph) << "\t"
-    //          << EdgeWeightMap[*edge_it] << endl;
-    // }
+    cout << "Source" << "\tTarget" << "\tWeight" << endl;
+    for(tie(edge_it, edge_end) = boost::edges(graph); edge_it != edge_end; ++edge_it)
+    {
+        cout << boost::source(*edge_it, graph) << "\t"
+             << boost::target(*edge_it, graph) << "\t"
+             << EdgeWeightMap[*edge_it] << endl;
+    }
 
 
 
@@ -734,8 +751,8 @@ int main()
     // I use ::value_type* instead.
     typedef std::vector<Vertex>::value_type* Piter; //NEEDED??
 
-    boost::graph_traits<Graph>::vertices_size_type d[63];
-    std::fill_n(d, 63, 0);
+    boost::graph_traits<Graph>::vertices_size_type d[totalVertices - 1];
+    std::fill_n(d, totalVertices - 1, 0);
 
      p[s] = s;
 
@@ -770,6 +787,7 @@ int main()
 
     if (boost::num_vertices(graph) <= boost::num_vertices(graph))
     {
+        /*
         std::cout << "distances: ";
         #ifdef BOOST_OLD_STREAM_ITERATORS
         std::copy(d, d + 5, std::ostream_iterator<int, char>(std::cout, " "));
@@ -777,41 +795,24 @@ int main()
         std::copy(d, d + 5, std::ostream_iterator<int>(std::cout, " "));
         #endif
         std::cout << std::endl;
-
+        */
         std::for_each(boost::vertices(graph).first, boost::vertices(graph).second,
                      print_parent<Piter>(&p[0]));
 
 
         //cout << "End: " << boost::vertices(graph).end << endl;;
-        Vertex end;
-        vector <Vertex> predecessors;
-        for(end = vertex(totalRows*totalColumns - 1, graph); end != vertex(0, graph); end = p[end])
-        {
-            //cout << "end: " << end << endl;
-            predecessors.push_back(end);
-        }
-        predecessors.push_back(end);
-        //cout << "end: " << end << endl;
 
-        for(unsigned int i = 0; i < predecessors.size(); i++)
-        {
-            if(predecessors[i] == 0)
-            {
-                continue;
-            }
-            cout << "\nNode: " << predecessors[i]
-                 << "\t Parent: " << predecessors[i+1] << endl;
-        }
+        //cout << "end: " << end << endl;
 
 
         /*for(unsigned int i = 0; i < predecessors.size(); i++)
         {
             if(predecessors[i] == 0)
                 continue;
-            pair<Vertex, int> tempPair;
-            pair < map<Vertex, int>::iterator, bool > result;
-            cout << "\nNode = " << predecessors[i]
-                 << "\tParent = " << predecessors[i+1] << endl;
+                pair<Vertex, int> tempPair;
+                pair < map<Vertex, int>::iterator, bool > result;
+                cout << "\nNode = " << predecessors[i]
+                     << "\tParent = " << predecessors[i+1] << endl;
 
             tempPair.first = predecessors[i+1];
             vertexes[predecessors[i]].target.push_back(tempPair);
@@ -824,51 +825,74 @@ int main()
         }*/
     }
 
-    cout << "\nSource" << "\tTarget" << "\tWeight" << endl;
+    // cout << "\nSource" << "\tTarget" << "\tWeight" << endl;
     for(tie(edge_it, edge_end) = boost::edges(graph); edge_it != edge_end; ++edge_it)
     {
-        cout << boost::source(*edge_it, graph) << "\t"
-             << boost::target(*edge_it, graph) << "\t"
-             << EdgeWeightMap[*edge_it] << endl;
+        // cout << boost::source(*edge_it, graph) << "\t"
+        //      << boost::target(*edge_it, graph) << "\t"
+        //      << EdgeWeightMap[*edge_it] << endl;
 
         pair<Vertex, int> tempPair;
-        cout << "Adding: " << boost::target(*edge_it, graph)
-        << " to "
-        << vertexes[boost::source(*edge_it, graph)].id
-        << " with weight: "
-        << EdgeWeightMap[*edge_it] << endl;
+        // cout << "Adding: " << boost::target(*edge_it, graph)
+        // << " to "
+        // << vertexes[boost::source(*edge_it, graph)].id
+        // << " with weight: "
+        // << EdgeWeightMap[*edge_it] << endl;
         tempPair.first = boost::target(*edge_it, graph);
         tempPair.second = EdgeWeightMap[*edge_it];
         vertexes[boost::source(*edge_it, graph)].target.push_back(tempPair);
 
-        int vecSize = vertexes[boost::source(*edge_it, graph)].target.size();
-        cout << "Current vector size for node "
-        << vertexes[boost::source(*edge_it, graph)].id
-        << " is: " << vecSize << endl;
-        cout << "Added the following:"
-        << "\nNode: "
-        << vertexes[boost::source(*edge_it, graph)].id
-        << "\tTarget: "
-        << vertexes[boost::source(*edge_it, graph)].target[vecSize-1].first
-        << "\tEdge Weight: "
-        << vertexes[boost::source(*edge_it, graph)].target[vecSize-1].second
-        << endl << endl;
-
-
-              /*if(vertexes[boost::target(*edge_it, graph)].target.size() > 0)
-              {
-                  cout << "Targets exist" << endl;
-                  cout << "Parent of target: "
-                  << vertexes[boost::target(*edge_it, graph)].target[0].first
-                  << endl;
-              }
-              else
-              {
-                  cout << "Target does NOT exist" << endl;
-              }*/
+        // int vecSize = vertexes[boost::source(*edge_it, graph)].target.size();
+        // cout << "Current vector size for node "
+        // << vertexes[boost::source(*edge_it, graph)].id
+        // << " is: " << vecSize << endl;
+        // cout << "Added the following:"
+        // << "\nNode: "
+        // << vertexes[boost::source(*edge_it, graph)].id
+        // << "\tTarget: "
+        // << vertexes[boost::source(*edge_it, graph)].target[vecSize-1].first
+        // << "\tEdge Weight: "
+        // << vertexes[boost::source(*edge_it, graph)].target[vecSize-1].second
+        // << endl << endl;
     }
 
+    Vertex end;
+    vector <Vertex> predecessors;
+    for(end = vertex(totalRows*totalColumns - 1, graph); end != vertex(0, graph); end = p[end])
+    {
+        //cout << "end: " << end << endl;
+        predecessors.push_back(end);
+    }
+    predecessors.push_back(end);
 
+    reverse(predecessors.begin(), predecessors.end());
+    for(unsigned int i = 0; i < predecessors.size(); i++)
+    {
+        /*
+        if(predecessors[i] == 0)
+        {
+            continue;
+        }
+        */
+        cout << "\nNode: " << predecessors[i]
+             << " \t Target: " << predecessors[i+1] << endl;
+
+        int vecSize;
+        unsigned int targetVector;
+        targetVector = predecessors[i+1];
+        vecSize = vertexes[predecessors[i]].target.size();
+        cout << "Vector Size: " << vecSize << endl;
+        for(int j = 0; j < vecSize; j++)
+        {
+            if(vertexes[predecessors[i]].target[j].first == targetVector)
+            {
+                cout << vertexes[predecessors[i]].target[j].second
+                     << vertexes[predecessors[i]].direction << endl;
+                outFile << vertexes[predecessors[i]].target[j].second
+                        << vertexes[predecessors[i]].direction << " ";
+            }
+        }
+    }
 
 
 
