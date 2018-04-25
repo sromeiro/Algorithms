@@ -1,7 +1,9 @@
+CFLAGS=-I${BOOST_HOME} -Wall
+
 all: proj
 
 proj: main.o
-	g++ -Wall -I$BOOST_HOME main.o -o proj
+	g++ $(CFLAGS) main.o -o proj
 
 main.o: main.cpp
 	g++ -Wall -c main.cpp
