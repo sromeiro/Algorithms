@@ -1,5 +1,5 @@
 #include<iostream>
-#include<stdlib.h>
+#include<cstdlib>
 #include<stdexcept>
 #include<string>
 #include<fstream>
@@ -241,7 +241,7 @@ int main()
                 case 'R':
                     //When we find a RED arrow
                     // cout << "I'm a " << vertexes[i].color << " vertex at " << vertexes[i].id << endl;
-                    for(j = i; j < (totalRows + i) - (i % totalRows); j++)
+                    for(j = i; j < (totalColumns + i) - (i % totalColumns); j++)
                     {
                         edgeWeight++;
                         if(vertexes[j].color == 'B')
@@ -265,7 +265,7 @@ int main()
                 case 'B':
                     //When we find a BLUE arrow
                     // cout << "I'm a " << vertexes[i].color << " vertex at " << vertexes[i].id << endl;
-                    for(j = i; j < (totalRows + i) - (i % totalRows); j++)
+                    for(j = i; j < (totalColumns + i) - (i % totalColumns); j++)
                     {
                         edgeWeight++;
                         if(vertexes[j].color == 'R')
@@ -353,26 +353,37 @@ int main()
         {
             //variable edgeWeight for weight
             int edgeWeight = -1;
-            // cout << "\nFound: " << vertexes[i].direction << endl;
+            // int edgeWeight = 0;
+            cout << "\nFound: " << vertexes[i].direction << endl;
             switch(vertexes[i].color)
             {
                 case 'R':
                     //When we find a RED arrow
-                    // cout << "I'm a " << vertexes[i].color << " vertex at " << vertexes[i].id << endl;
-                    for(j = i; j >= 0; j -= totalRows)
+                    cout << "I'm a " << vertexes[i].color << " vertex at " << vertexes[i].id << endl;
+                    for(j = i; j >= 0; j -= totalColumns)
                     {
                         edgeWeight++;
                         if(vertexes[j].color == 'B')
                         {
                             //Add edge between i and j with weight
+                            // int a = vertexes[i].id/totalRows;
+                            // int b = vertexes[j].id/totalRows;
+                            // cout << "a = " << a << " b = " << b << endl;
+                            // edgeWeight = abs(a - b);
+                            // cout << "edgeWeight = " <<  edgeWeight << endl;
                             edge = add_edge(vertexes[i].id, vertexes[j].id, EdgeWeightProperty(edgeWeight), graph);
-                            // cout << "Found a " << vertexes[j].color
-                            // << " at vertex " << vertexes[j].id
-                            // << " with edge weight: " << edgeWeight << endl;
+                            cout << "Found a " << vertexes[j].color
+                            << " at vertex " << vertexes[j].id
+                            << " with edge weight: " << edgeWeight << endl;
                         }
                         else if(vertexes[j].color == 'O')
                         {
                             //Probably NEVER find this
+                            // int a = vertexes[i].id/totalRows;
+                            // int b = vertexes[j].id/totalRows;
+                            // cout << "a = " << a << " b = " << b << endl;
+                            // edgeWeight = abs(a - b);
+                            // cout << "edgeWeight = " <<  edgeWeight << endl;
                             edge = add_edge(vertexes[i].id, vertexes[j].id, EdgeWeightProperty(edgeWeight), graph);
                             cout << "FOUND TARGET " << vertexes[j].color << " at vertex " << vertexes[j].id << endl;
                         }
@@ -380,21 +391,31 @@ int main()
                     break;
                 case 'B':
                     //When we find a BLUE arrow
-                    // cout << "I'm a " << vertexes[i].color << " vertex at " << vertexes[i].id << endl;
-                    for(j = i; j >= 0; j -= totalRows)
+                    cout << "I'm a " << vertexes[i].color << " vertex at " << vertexes[i].id << endl;
+                    for(j = i; j >= 0; j -= totalColumns)
                     {
                         edgeWeight++;
                         if(vertexes[j].color == 'R')
                         {
                             //Add edge between i and j with weight
+                            // int a = vertexes[i].id/totalRows;
+                            // int b = vertexes[j].id/totalRows;
+                            // cout << "a = " << a << " b = " << b << endl;
+                            // edgeWeight = abs(a - b);
+                            // cout << "edgeWeight = " <<  edgeWeight << endl;
                             edge = add_edge(vertexes[i].id, vertexes[j].id, EdgeWeightProperty(edgeWeight), graph);
-                            // cout << "Found a " << vertexes[j].color
-                            // << " at vertex " << vertexes[j].id
-                            // << " with edge weight: " << edgeWeight << endl;
+                            cout << "Found a " << vertexes[j].color
+                            << " at vertex " << vertexes[j].id
+                            << " with edge weight: " << edgeWeight << endl;
                         }
                         else if(vertexes[j].color == 'O')
                         {
                             //Probably NEVER find this
+                            // int a = vertexes[i].id/totalRows;
+                            // int b = vertexes[j].id/totalRows;
+                            // cout << "a = " << a << " b = " << b << endl;
+                            // edgeWeight = abs(a - b);
+                            // cout << "edgeWeight = " <<  edgeWeight << endl;
                             edge = add_edge(vertexes[i].id, vertexes[j].id, EdgeWeightProperty(edgeWeight), graph);
                             cout << "FOUND TARGET " << vertexes[j].color << " at vertex " << vertexes[j].id << endl;
                         }
@@ -406,54 +427,77 @@ int main()
         {
             //variable edgeWeight for weight
             int edgeWeight = -1;
-            // cout << "\nFound: " << vertexes[i].direction << endl;
+            // int edgeWeight = 0;
+            cout << "\nFound: " << vertexes[i].direction << endl;
             switch(vertexes[i].color)
             {
                 case 'R':
                     //When we find a RED arrow
-                    // cout << "I'm a " << vertexes[i].color << " vertex at " << vertexes[i].id << endl;
-                    for(j = i; j <= totalVertices - 1; j += totalRows)
+                    cout << "I'm a " << vertexes[i].color << " vertex at " << vertexes[i].id << endl;
+                    for(j = i; j <= totalVertices - 1; j += totalColumns)
                     {
                         edgeWeight++;
                         if(vertexes[j].color == 'B')
                         {
                             //Add edge between i and j with weight
+                            // int a = vertexes[i].id/totalColumns;
+                            // int b = vertexes[j].id/totalColumns;
+                            // cout << "vertexes[i].id = " << vertexes[i].id
+                            //      << "\tvertexes[j].id = " << vertexes[j].id << endl;
+                            // cout << "a = " << a << " b = " << b << endl;
+                            // edgeWeight = abs(a - b);
+                            // cout << "edgeWeight = " <<  edgeWeight << endl;
                             edge = add_edge(vertexes[i].id, vertexes[j].id, EdgeWeightProperty(edgeWeight), graph);
-                            // cout << "Found a " << vertexes[j].color
-                            // << " at vertex " << vertexes[j].id
-                            // << " with edge weight: " << edgeWeight << endl;
+                            cout << "Found a " << vertexes[j].color
+                            << " at vertex " << vertexes[j].id
+                            << " with edge weight: " << edgeWeight << endl;
                         }
                         else if(vertexes[j].color == 'O')
                         {
                             //Target FOUND add edge between i and j with weight
+                            // int a = vertexes[i].id/totalRows;
+                            // int b = vertexes[j].id/totalRows;
+                            // cout << "a = " << a << " b = " << b << endl;
+                            // edgeWeight = abs(a - b);
+                            // cout << "edgeWeight = " <<  edgeWeight << endl;
                             edge = add_edge(vertexes[i].id, vertexes[j].id, EdgeWeightProperty(edgeWeight), graph);
-                            // cout << "FOUND TARGET " << vertexes[j].color
-                            // << " at vertex " << vertexes[j].id
-                            // << " with edge weight: " << edgeWeight << endl;
+                            cout << "FOUND TARGET " << vertexes[j].color
+                            << " at vertex " << vertexes[j].id
+                            << " with edge weight: " << edgeWeight << endl;
                         }
                     }
                     break;
                 case 'B':
                     //When we find a BLUE arrow
-                    // cout << "I'm a " << vertexes[i].color << " vertex at " << vertexes[i].id << endl;
-                    for(j = i; j <= totalVertices - 1; j += totalRows)
+                    cout << "I'm a " << vertexes[i].color << " vertex at " << vertexes[i].id << endl;
+                    for(j = i; j <= totalVertices - 1; j += totalColumns)
                     {
                         edgeWeight++;
                         if(vertexes[j].color == 'R')
                         {
                             //Add edge between i and j with weight
+                            // int a = vertexes[i].id/totalRows;
+                            // int b = vertexes[j].id/totalRows;
+                            // cout << "a = " << a << " b = " << b << endl;
+                            // edgeWeight = abs(a - b);
+                            // cout << "edgeWeight = " <<  edgeWeight << endl;
                             edge = add_edge(vertexes[i].id, vertexes[j].id, EdgeWeightProperty(edgeWeight), graph);
-                            // cout << "Found a " << vertexes[j].color
-                            // << " at vertex " << vertexes[j].id
-                            // << " with edge weight: " << edgeWeight << endl;
+                            cout << "Found a " << vertexes[j].color
+                            << " at vertex " << vertexes[j].id
+                            << " with edge weight: " << edgeWeight << endl;
                         }
                         else if(vertexes[j].color == 'O')
                         {
                             //Target FOUND add edge between i and j with weight
+                            // int a = vertexes[i].id/totalRows;
+                            // int b = vertexes[j].id/totalRows;
+                            // cout << "a = " << a << " b = " << b << endl;
+                            // edgeWeight = abs(a - b);
+                            // cout << "edgeWeight = " <<  edgeWeight << endl;
                             edge = add_edge(vertexes[i].id, vertexes[j].id, EdgeWeightProperty(edgeWeight), graph);
-                            // cout << "FOUND TARGET " << vertexes[j].color
-                            // << " at vertex " << vertexes[j].id
-                            // << " with edge weight: " << edgeWeight << endl;
+                            cout << "FOUND TARGET " << vertexes[j].color
+                            << " at vertex " << vertexes[j].id
+                            << " with edge weight: " << edgeWeight << endl;
                         }
                     }
                     break;
@@ -469,7 +513,7 @@ int main()
                 case 'R':
                     //When we find a RED arrow
                     // cout << "I'm a " << vertexes[i].color << " vertex at " << vertexes[i].id << endl;
-                    for(j = i, x = i; j >= 0 && x >= (i/totalColumns) * totalColumns; j -= totalRows + 1, x--)
+                    for(j = i, x = i; j >= 0 && x >= (i/totalColumns) * totalColumns; j -= totalColumns + 1, x--)
                     {
                         edgeWeight++;
                         if(vertexes[j].color == 'B')
@@ -491,7 +535,7 @@ int main()
                 case 'B':
                     //When we find a BLUE arrow
                     // cout << "I'm a " << vertexes[i].color << " vertex at " << vertexes[i].id << endl;
-                    for(j = i, x = i; j >= 0 && x >= (i/totalColumns) * totalColumns; j -= totalRows + 1, x--)
+                    for(j = i, x = i; j >= 0 && x >= (i/totalColumns) * totalColumns; j -= totalColumns + 1, x--)
                     {
                         edgeWeight++;
                         if(vertexes[j].color == 'R')
@@ -522,7 +566,7 @@ int main()
                 case 'R':
                     //When we find a RED arrow
                     // cout << "I'm a " << vertexes[i].color << " vertex at " << vertexes[i].id << endl;
-                    for(j = i, x = i; j <= totalVertices - 1 && x < (totalRows + i) - (i % totalRows) ; j += totalRows + 1, x++)
+                    for(j = i, x = i; j <= totalVertices - 1 && x < (totalColumns + i) - (i % totalColumns); j += totalColumns + 1, x++)
                     {
                         edgeWeight++;
                         if(vertexes[j].color == 'B')
@@ -546,7 +590,7 @@ int main()
                 case 'B':
                     //When we find a BLUE arrow
                     // cout << "I'm a " << vertexes[i].color << " vertex at " << vertexes[i].id << endl;
-                    for(j = i, x = i; j <= totalVertices && x < (totalRows + i) - (i % totalRows) ; j += totalRows + 1, x++)
+                    for(j = i, x = i; j <= totalVertices && x < (totalColumns + i) - (i % totalColumns); j += totalColumns + 1, x++)
                     {
                         edgeWeight++;
                         if(vertexes[j].color == 'R')
@@ -579,7 +623,7 @@ int main()
                 case 'R':
                     //When we find a RED arrow
                     // cout << "I'm a " << vertexes[i].color << " vertex at " << vertexes[i].id << endl;
-                    for(j = i, x = i; j >= 0 && x < (totalRows + i) - (i % totalRows) ; j -= totalRows - 1, x++)
+                    for(j = i, x = i; j >= 0 && x < (totalColumns + i) - (i % totalColumns); j -= totalColumns - 1, x++)
                     {
                         edgeWeight++;
                         if(vertexes[j].color == 'B')
@@ -601,7 +645,7 @@ int main()
                 case 'B':
                     //When we find a BLUE arrow
                     // cout << "I'm a " << vertexes[i].color << " vertex at " << vertexes[i].id << endl;
-                    for(j = i, x = i; j >= 0 && x < (totalRows + i) - (i % totalRows) ; j -= totalRows - 1, x++)
+                    for(j = i, x = i; j >= 0 && x < (totalColumns + i) - (i % totalColumns); j -= totalColumns - 1, x++)
                     {
                         edgeWeight++;
                         if(vertexes[j].color == 'R')
@@ -632,7 +676,7 @@ int main()
                 case 'R':
                     //When we find a RED arrow
                     // cout << "I'm a " << vertexes[i].color << " vertex at " << vertexes[i].id << endl;
-                    for(j = i, x = i; j <= totalVertices - 1 && x >= (i/totalColumns) * totalColumns; j += totalRows - 1, x--)
+                    for(j = i, x = i; j <= totalVertices - 1 && x >= (i/totalColumns) * totalColumns; j += totalColumns - 1, x--)
                     {
                         edgeWeight++;
                         if(vertexes[j].color == 'B')
@@ -654,7 +698,7 @@ int main()
                 case 'B':
                     //When we find a BLUE arrow
                     // cout << "I'm a " << vertexes[i].color << " vertex at " << vertexes[i].id << endl;
-                    for(j = i, x = i; j <= totalVertices - 1 && x >= (i/totalColumns) * totalColumns; j += totalRows - 1, x--)
+                    for(j = i, x = i; j <= totalVertices - 1 && x >= (i/totalColumns) * totalColumns; j += totalColumns - 1, x--)
                     {
                         edgeWeight++;
                         if(vertexes[j].color == 'R')
